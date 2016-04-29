@@ -21,7 +21,10 @@ RH_NRF24 nrf24;
 #include "FastLED.h"
 
 // How many leds in your strip?
-#define NUM_LEDS 19
+#define NUM_G_LEDS 19
+#define NUM_V_LEDS 17
+
+#define NUM_LEDS NUM_G_LEDS + NUM_V_LEDS
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
@@ -29,6 +32,7 @@ RH_NRF24 nrf24;
 #define DATA_PIN 6
 
 CRGB leds[NUM_LEDS];
+CRGB ledsTemp[NUM_G_LEDS];
 
 
 USB Usb;
@@ -42,7 +46,8 @@ SPP SerialBT(&Btd, "GRADCAP", "1444"); // This will set the name to the defaults
 bool firstMessage = true;
 
 void setup() {
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_G_LEDS);
+  FastLED.setCorrection(TypicalLEDStrip);
   Serial.begin(115200);
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
@@ -79,6 +84,7 @@ void loop() {
     if (firstMessage) {
       firstMessage = false;
       SerialBT.println(F("Hello from Arduino")); // Send welcome message
+      Serial.println(F("Hello from Arduino")); // Send welcome message
     }
     while (SerialBT.available())
     {
@@ -135,34 +141,34 @@ void anim1(const struct CRGB & color)
 {
   for (int dot = 0; dot < NUM_LEDS; dot++) {
     leds[dot] = color;
-    show();
+    showLeds();
     // clear this led for the next time around the loop
     leds[dot] = CRGB::Black;
-    delay(250);
+    delay(500);
   }
-  show();
+  showLeds();
 
 }
 void anim2(struct CHSV & color)
 {
-  for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+  for (int dot = 0; dot < NUM_LEDS; dot++) {
     leds[dot] = CHSV(color);
     color.hue += 2;
-    show();
+    showLeds();
     // clear this led for the next time around the loop
     delay(100);
     for (int i = 0; i < NUM_LEDS; i++)
     {
-      nscale8x3(leds[i].r, leds[i].g, leds[i].b, 240);
+      nscale8x3(leds[i].r, leds[i].g, leds[i].b, 250);
     }
   }
-  show();
+  showLeds();
 }
 void anim3(uint8_t value)
 {
 
 
-  for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+  for (int dot = 0; dot < NUM_LEDS; dot++) {
     if (dot % 2)
     {
       leds[dot] = CHSV(147, 255, 135);
@@ -171,7 +177,7 @@ void anim3(uint8_t value)
     {
       leds[dot] = CHSV(147, 0, 135);
     }
-    show();
+    showLeds();
     // clear this led for the next time around the loop
     delay(100);
   }
@@ -180,7 +186,7 @@ void anim4(uint8_t value)
 {
   for (int i = 0; i < 2; i++)
   {
-    for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+    for (int dot = 0; dot < NUM_LEDS; dot++) {
       if (dot % 2)
       {
         if (i % 2)
@@ -203,7 +209,7 @@ void anim4(uint8_t value)
           leds[dot] = CHSV(147, 255, 135);
         }
       }
-      show();
+      showLeds();
       // clear this led for the next time around the loop
     }
     delay(250);
@@ -212,9 +218,9 @@ void anim4(uint8_t value)
 }
 void anim5(const struct CRGB & color)
 {
-  for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+  for (int dot = 0; dot < NUM_LEDS; dot++) {
     leds[dot] = color;
-    show();
+    showLeds();
     // clear this led for the next time around the loop
     for (int i = 0; i < NUM_LEDS; i++)
     {
@@ -222,7 +228,7 @@ void anim5(const struct CRGB & color)
     }
     delay(80);
   }
-  show();
+  showLeds();
 }
 void anim6(struct CHSV & color)
 {
@@ -230,9 +236,9 @@ void anim6(struct CHSV & color)
   for (int i = 0; i < val; i += 7)
   {
     color.val = i;
-    for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+    for (int dot = 0; dot < NUM_LEDS; dot++) {
       leds[dot] = CHSV(color);
-      show();
+      showLeds();
     }
     delay(5);
   }
@@ -240,9 +246,9 @@ void anim6(struct CHSV & color)
   for (int i = val; i >= 0; i -= 7)
   {
     color.val = i;
-    for (int dot = NUM_LEDS - 1; dot >= 0; dot--) {
+    for (int dot = 0; dot < NUM_LEDS; dot++) {
       leds[dot] = CHSV(color);
-      show();
+      showLeds();
     }
     delay(5);
   }
@@ -253,9 +259,39 @@ void anim6(struct CHSV & color)
 /* Reorder the data to display the center of the G first, send the V
     portion using NRF24, show the LEDs, and then restore LED order in the G
 */
-void show()
+void showLeds()
 {
+  int i;
+  //Invert the G LEDS
+  for(i=0;i<NUM_G_LEDS;i++)
+  {
+    ledsTemp[(NUM_G_LEDS-1)-i] = leds[i];
+  }
+  for(i=0;i<NUM_G_LEDS;i++)
+  {
+    leds[i] = ledsTemp[i];
+  }
+
+  //Send the V leds over the NRF24
+//  nrf24.send((uint8_t*)&leds[NUM_G_LEDS], 28);
+//  nrf24.waitPacketSent();
+//  nrf24.send((uint8_t*)(&leds[NUM_G_LEDS]+28), (NUM_V_LEDS*sizeof(CRGB) - 28));
+  nrf24.send((uint8_t*)&leds[NUM_G_LEDS], 27);
+  nrf24.waitPacketSent();
+  delay(1);
+  nrf24.send((uint8_t*)&leds[NUM_G_LEDS+9], 24);
+  nrf24.waitPacketSent();
   FastLED.show();
+
+  //Restore the G leds
+  for(i=0;i<NUM_G_LEDS;i++)
+  {
+    ledsTemp[(NUM_G_LEDS-1)-i] = leds[i];
+  }
+  for(i=0;i<NUM_G_LEDS;i++)
+  {
+    leds[i] = ledsTemp[i];
+  }
 
 }
 
