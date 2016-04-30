@@ -184,12 +184,12 @@ void anim3(uint8_t value)
 }
 void anim4(uint8_t value)
 {
-  for (int i = 0; i < 2; i++)
+  for (int i = 0; i < 20; i++)
   {
     for (int dot = 0; dot < NUM_LEDS; dot++) {
       if (dot % 2)
       {
-        if (i % 2)
+        if (i>10)
         {
           leds[dot] = CHSV(147, 255, 135);
         }
@@ -200,7 +200,7 @@ void anim4(uint8_t value)
       }
       else
       {
-        if (i % 2)
+        if (i>10)
         {
           leds[dot] = CHSV(147, 0, 135);
         }
@@ -209,12 +209,12 @@ void anim4(uint8_t value)
           leds[dot] = CHSV(147, 255, 135);
         }
       }
-      showLeds();
       // clear this led for the next time around the loop
+      
     }
-    delay(250);
+    showLeds();
+    delay(50);
   }
-
 }
 void anim5(const struct CRGB & color)
 {
@@ -228,6 +228,7 @@ void anim5(const struct CRGB & color)
     }
     delay(80);
   }
+  showLeds();
   showLeds();
 }
 void anim6(struct CHSV & color)
@@ -263,32 +264,32 @@ void showLeds()
 {
   int i;
   //Invert the G LEDS
-  for(i=0;i<NUM_G_LEDS;i++)
+  for (i = 0; i < NUM_G_LEDS; i++)
   {
-    ledsTemp[(NUM_G_LEDS-1)-i] = leds[i];
+    ledsTemp[(NUM_G_LEDS - 1) - i] = leds[i];
   }
-  for(i=0;i<NUM_G_LEDS;i++)
+  for (i = 0; i < NUM_G_LEDS; i++)
   {
     leds[i] = ledsTemp[i];
   }
 
   //Send the V leds over the NRF24
-//  nrf24.send((uint8_t*)&leds[NUM_G_LEDS], 28);
-//  nrf24.waitPacketSent();
-//  nrf24.send((uint8_t*)(&leds[NUM_G_LEDS]+28), (NUM_V_LEDS*sizeof(CRGB) - 28));
+  //  nrf24.send((uint8_t*)&leds[NUM_G_LEDS], 28);
+  //  nrf24.waitPacketSent();
+  //  nrf24.send((uint8_t*)(&leds[NUM_G_LEDS]+28), (NUM_V_LEDS*sizeof(CRGB) - 28));
   nrf24.send((uint8_t*)&leds[NUM_G_LEDS], 27);
   nrf24.waitPacketSent();
   delay(1);
-  nrf24.send((uint8_t*)&leds[NUM_G_LEDS+9], 24);
+  nrf24.send((uint8_t*)&leds[NUM_G_LEDS + 9], 24);
   nrf24.waitPacketSent();
   FastLED.show();
 
   //Restore the G leds
-  for(i=0;i<NUM_G_LEDS;i++)
+  for (i = 0; i < NUM_G_LEDS; i++)
   {
-    ledsTemp[(NUM_G_LEDS-1)-i] = leds[i];
+    ledsTemp[(NUM_G_LEDS - 1) - i] = leds[i];
   }
-  for(i=0;i<NUM_G_LEDS;i++)
+  for (i = 0; i < NUM_G_LEDS; i++)
   {
     leds[i] = ledsTemp[i];
   }
