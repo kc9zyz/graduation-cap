@@ -69,6 +69,7 @@ void setup() {
     Serial.println("setChannel failed");
   if (!nrf24.setRF(RH_NRF24::DataRate2Mbps, RH_NRF24::TransmitPower0dBm))
     Serial.println("setRF failed");
+    clearLeds();
 }
 String myString = "";
 
@@ -137,6 +138,13 @@ void loop() {
 
 
 }
+void clearLeds()
+{
+  for (int dot = 0; dot < NUM_LEDS; dot++) {
+    leds[dot] = CHSV(147,255,50);
+  }
+  showLeds();
+}
 void anim1(const struct CRGB & color)
 {
   for (int dot = 0; dot < NUM_LEDS; dot++) {
@@ -171,11 +179,11 @@ void anim3(uint8_t value)
   for (int dot = 0; dot < NUM_LEDS; dot++) {
     if (dot % 2)
     {
-      leds[dot] = CHSV(147, 255, 135);
+      leds[dot] = CHSV(147, 255, value);
     }
     else
     {
-      leds[dot] = CHSV(147, 0, 135);
+      leds[dot] = CHSV(147, 0, value);
     }
     showLeds();
     // clear this led for the next time around the loop
@@ -191,26 +199,24 @@ void anim4(uint8_t value)
       {
         if (i>10)
         {
-          leds[dot] = CHSV(147, 255, 135);
+          leds[dot] = CHSV(147, 255, value);
         }
         else
         {
-          leds[dot] = CHSV(147, 0, 135);
+          leds[dot] = CHSV(147, 0, value);
         }
       }
       else
       {
         if (i>10)
         {
-          leds[dot] = CHSV(147, 0, 135);
+          leds[dot] = CHSV(147, 0, value);
         }
         else
         {
-          leds[dot] = CHSV(147, 255, 135);
+          leds[dot] = CHSV(147, 255, value);
         }
       }
-      // clear this led for the next time around the loop
-      
     }
     showLeds();
     delay(50);

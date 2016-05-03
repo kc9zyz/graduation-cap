@@ -22,6 +22,7 @@ void setup() {
     Serial.println("setChannel failed");
   if (!nrf24.setRF(RH_NRF24::DataRate2Mbps, RH_NRF24::TransmitPower0dBm))
     Serial.println("setRF failed");
+    clearLeds();
 
 }
 
@@ -42,4 +43,11 @@ void loop() {
     }
 
   }
+}
+void clearLeds()
+{
+  for (int dot = 0; dot < NUM_V_LEDS; dot++) {
+    leds[dot] = CHSV(147,255,50);
+  }
+  FastLED.show();
 }

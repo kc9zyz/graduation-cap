@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -23,6 +25,9 @@ import app.akexorcist.bluetotohspp.library.DeviceList;
 
 public class MainActivity extends AppCompatActivity {
     public static BluetoothSPP bt = null;
+    public static int hue = 50;
+    public static int sat = 255;
+    public static int val = 80;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,29 +50,76 @@ public class MainActivity extends AppCompatActivity {
                 // Perform action on click
                 Spinner spinner = (Spinner) findViewById(R.id.spinner);
                 Log.w("MyApp",""+spinner.getSelectedItemPosition());
-                bt.send("{\"a\":2,\"h\":25,\"s\":255,\"v\":130}.",true);
+                bt.send("{\"a\":"+(spinner.getSelectedItemPosition()+1)+",\"h\":"+hue+",\"s\":"+sat+",\"v\":"+val+"}.",true);
             }
         });
 
         if(bt == null) {
             bt = new BluetoothSPP(this);
-            Log.w("MyApp","INIT");
+            Log.w("MyApp", "INIT");
         }
         final Button button2 = (Button) findViewById(R.id.button2);
-
         button2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
                 bt.connect("00:15:83:0C:BF:EB");
 
             }
         });
+        final SeekBar hueBar = (SeekBar) findViewById(R.id.seekBar);
+        hueBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                hue = progress;
+                TextView text;
+                text = (TextView) findViewById(R.id.textView);
+                text.setText("Hue - "+hue);
+            }
 
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
 
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        final SeekBar satBar = (SeekBar) findViewById(R.id.seekBar2);
+        satBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                sat = progress;
+                TextView text;
+                text = (TextView) findViewById(R.id.textView2);
+                text.setText("Saturation - "+sat);
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        final SeekBar valBar = (SeekBar) findViewById(R.id.seekBar3);
+        valBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                val = progress;
+                TextView text;
+                text = (TextView) findViewById(R.id.textView3);
+                text.setText("Value - "+val);
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
     }
 
     @Override

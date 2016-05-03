@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Saturation - 50"
+        android:text="Saturation - 255"
         android:id="@+id/textView2"
         android:layout_below="@+id/seekBar"
         android:layout_alignParentLeft="true"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/seekBar2"
         android:max="255"
-        android:progress="50"
+        android:progress="255"
         android:indeterminate="false"
         android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
@@ -63,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Value - 50"
+        android:text="Value - 80"
         android:id="@+id/textView3"
         android:layout_below="@+id/seekBar2"
         android:layout_alignParentLeft="true"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/seekBar3"
         android:max="255"
-        android:progress="50"
+        android:progress="80"
         android:indeterminate="false"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textView3"
@@ -123,4 +123,5 @@
         android:layout_toEndOf="@+id/textView4"
         android:layout_marginLeft="57dp"
         android:layout_marginStart="57dp" />
+
 </RelativeLayout>
